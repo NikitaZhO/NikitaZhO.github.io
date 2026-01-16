@@ -5,38 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hello MAX</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin-top: 5rem; }
-    button { padding: 10px 20px; font-size: 1rem; }
+    body { font-family: Arial; padding: 2rem; }
+    .block { margin-bottom: 1rem; }
   </style>
 </head>
 <body>
 
-  <h1 id="greeting">Hello!</h1>
-  <p id="phone-info"></p>
-  <button id="get-phone-btn">Получить телефон</button>
+  <h2>Мини-апп информация</h2>
+
+  <div class="block" id="bot"></div>
+  <div class="block" id="user"></div>
+  <div class="block" id="phone"></div>
 
   <script src="https://st.max.ru/js/max-web-app.js"></script>
   <script>
-    // Данные пользователя из MAX
-    const user = window.WebApp && WebApp.initDataUnsafe?.user;
-    const greetingEl = document.getElementById('greeting');
-    const phoneInfoEl = document.getElementById('phone-info');
-    const btn = document.getElementById('get-phone-btn');
+    const init = WebApp.initDataUnsafe || {};
 
+    // Бот
+    const botId = init.query?.bot || "неизвестно";
+    document.getElementById("bot").innerHTML = `<b>Бот:</b> ${botId}`;
+
+    // Пользователь
+    const user = init.user;
     if (user) {
-      greetingEl.textContent = `Hello, ${user.first_name || "User"}!`;
+      document.getElementById("user").innerHTML = `
+        <b>Пользователь:</b><br>
+        ID: ${user.id}<br>
+        Имя: ${user.first_name || "-"}<br>
+        Username: ${user.username || "-"}
+      `;
     } else {
-      greetingEl.textContent = "Hello, stranger!";
+      document.getElementById("user").innerHTML = `<b>Пользователь:</b> неизвестно`;
     }
 
-    btn.addEventListener("click", () => {
-      // Запрашиваем телефон у пользователя
-      WebApp.requestContact().then(result => {
-        phoneInfoEl.textContent = "Телефон: " + result.phone;
-      }).catch(err => {
-        phoneInfoEl.textContent = "Телефон не получен";
-      });
-    });
+    // Телефон
+    if (user?.phone) {
+      document.getElementById("phone").innerHTML = `<b>Телефон:</b> ${user.phone}`;
+    } else {
+      document.getElementById("phone").innerHTML = `<b>Телефон:</b> не передан`;
+    }
   </script>
 
 </body>
