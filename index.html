@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hello MAX</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 5rem; }
+    button { padding: 10px 20px; font-size: 1rem; }
+  </style>
+</head>
+<body>
+
+  <h1 id="greeting">Hello!</h1>
+  <p id="phone-info"></p>
+  <button id="get-phone-btn">Получить телефон</button>
+
+  <script src="https://st.max.ru/js/max-web-app.js"></script>
+  <script>
+    // Данные пользователя из MAX
+    const user = window.WebApp && WebApp.initDataUnsafe?.user;
+    const greetingEl = document.getElementById('greeting');
+    const phoneInfoEl = document.getElementById('phone-info');
+    const btn = document.getElementById('get-phone-btn');
+
+    if (user) {
+      greetingEl.textContent = `Hello, ${user.first_name || "User"}!`;
+    } else {
+      greetingEl.textContent = "Hello, stranger!";
+    }
+
+    btn.addEventListener("click", () => {
+      // Запрашиваем телефон у пользователя
+      WebApp.requestContact().then(result => {
+        phoneInfoEl.textContent = "Телефон: " + result.phone;
+      }).catch(err => {
+        phoneInfoEl.textContent = "Телефон не получен";
+      });
+    });
+  </script>
+
+</body>
+</html>
