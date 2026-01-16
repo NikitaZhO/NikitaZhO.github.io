@@ -3,47 +3,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hello MAX</title>
+  <title>Hello MAX Mini App</title>
   <style>
-    body { font-family: Arial; padding: 2rem; }
-    .block { margin-bottom: 1rem; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    h2 {
+      margin-bottom: 1rem;
+    }
+    .block {
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      background: #f3f3f3;
+      border-radius: 6px;
+    }
   </style>
 </head>
 <body>
 
-  <h2>Мини-апп информация</h2>
+  <h2>Информация о запуске</h2>
 
   <div class="block" id="bot"></div>
   <div class="block" id="user"></div>
   <div class="block" id="phone"></div>
 
+  <!-- подключение MAX SDK -->
   <script src="https://st.max.ru/js/max-web-app.js"></script>
   <script>
+    // init data
     const init = WebApp.initDataUnsafe || {};
 
-    // Бот
-    const botId = init.query?.bot || "неизвестно";
-    document.getElementById("bot").innerHTML = `<b>Бот:</b> ${botId}`;
+    // BOT
+    const botId = init.query?.bot;
+    document.getElementById("bot").innerHTML = `
+      <b>Бот:</b> ${botId || "данные отсутствуют"}
+    `;
 
-    // Пользователь
+    // USER
     const user = init.user;
     if (user) {
       document.getElementById("user").innerHTML = `
         <b>Пользователь:</b><br>
         ID: ${user.id}<br>
-        Имя: ${user.first_name || "-"}<br>
-        Username: ${user.username || "-"}
+        Имя: ${user.first_name || "-"}
       `;
     } else {
-      document.getElementById("user").innerHTML = `<b>Пользователь:</b> неизвестно`;
+      document.getElementById("user").innerHTML = `
+        <b>Пользователь:</b> данные отсутствуют
+      `;
     }
 
-    // Телефон
+    // PHONE
+    const phoneBlock = document.getElementById("phone");
     if (user?.phone) {
-      document.getElementById("phone").innerHTML = `<b>Телефон:</b> ${user.phone}`;
+      phoneBlock.innerHTML = `<b>Телефон:</b> ${user.phone}`;
     } else {
-      document.getElementById("phone").innerHTML = `<b>Телефон:</b> не передан`;
+      phoneBlock.innerHTML = `<b>Телефон:</b> запрашиваю...`;
+
+      WebApp.requestContact()
+        .then(res => {
+          phoneBlock.innerHTML = `<b>Телефон:</b> ${res.phone}`;
+        })
+        .catch(() => {
+          phoneBlock.innerHTML = `<b>Телефон:</b> пользователь отказал или доступ запрещён`;
+        });
     }
+
+    // debug info (можешь посмотреть в консоли)
+    console.log("WebApp.initDataUnsafe:", init);
   </script>
 
 </body>
